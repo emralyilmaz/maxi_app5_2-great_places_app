@@ -17,24 +17,33 @@ class PlacesListScreen extends StatelessWidget {
               })
         ],
       ),
-      body: Consumer<GreatPlaces>(
-          child: Center(
-            child: const Text("Got no places yet, start adding some!"),
-          ),
-          builder: (ctx, greatPlaces, ch) => greatPlaces.items.length <= 0
-              ? ch
-              : ListView.builder(
-                  itemBuilder: (ctx, i) => ListTile(
-                    leading: CircleAvatar(
-                      backgroundImage: FileImage(greatPlaces.items[i].image),
-                    ),
-                    title: Text(greatPlaces.items[i].title),
-                    onTap: () {
-                      // go to detail page
-                    },
-                  ),
-                  itemCount: greatPlaces.items.length,
-                )),
+      body: FutureBuilder(
+        // futurebuilder ile veriler yuklenirken CircularProgressIndicator gösterilmesi saglandı.
+        future:
+            Provider.of<GreatPlaces>(context, listen: false).fechAndSetPlaces(),
+        builder: (ctx, snapshot) => snapshot.connectionState ==
+                ConnectionState.waiting
+            ? Center(child: CircularProgressIndicator())
+            : Consumer<GreatPlaces>(
+                child: Center(
+                  child: const Text("Got no places yet, start adding some!"),
+                ),
+                builder: (ctx, greatPlaces, ch) => greatPlaces.items.length <= 0
+                    ? ch
+                    : ListView.builder(
+                        itemBuilder: (ctx, i) => ListTile(
+                          leading: CircleAvatar(
+                            backgroundImage:
+                                FileImage(greatPlaces.items[i].image),
+                          ),
+                          title: Text(greatPlaces.items[i].title),
+                          onTap: () {
+                            // go to detail page
+                          },
+                        ),
+                        itemCount: greatPlaces.items.length,
+                      )),
+      ),
     );
   }
 }
